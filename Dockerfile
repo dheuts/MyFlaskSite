@@ -1,35 +1,13 @@
-FROM tiangolo/uwsgi-nginx:python3.8
+FROM python:3.8
 
-LABEL maintainer="Sebastian Ramirez <tiangolo@gmail.com>"
+LABEL maintainer="Dave Heuts dheuts@deofficespecialist.nl"
 
-RUN pip install flask
-RUN pip install flask-sqlalchemy
+WORKDIR /user/src/app
 
-# URL under which static (not modified by Python) files will be requested
-# They will be served by Nginx directly, without being handled by uWSGI
-ENV STATIC_URL /static
-# Absolute path in where the static files wil be
-ENV STATIC_PATH /app/static
+COPY './requirements.txt' .
 
-ENV LISTEN_PORT=8000
-EXPOSE 8000
+RUN pip install -r requirements.txt
 
-# Add demo app
-COPY /app /app
-WORKDIR /app
+COPY ./app .
 
-# Make /app/* available to be imported by Python globally to better support several use cases like Alembic migrations.
-ENV PYTHONPATH=/app
-
-# Move the base entrypoint to reuse it
-# RUN mv /entrypoint.sh /uwsgi-nginx-entrypoint.sh
-# Copy the entrypoint that will generate Nginx additional configs
-# COPY entrypoint.sh /entrypoint.sh
-# RUN chmod +x /entrypoint.sh
-
-# ENTRYPOINT ["/entrypoint.sh"]
-
-# Run the start script provided by the parent image tiangolo/uwsgi-nginx.
-# It will check for an /app/prestart.sh script (e.g. for migrations)
-# And then will start Supervisor, which in turn will start Nginx and uWSGI
-# CMD ["/start.sh"]
+ENTRYPOINT ['python', 'app.py']

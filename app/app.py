@@ -46,4 +46,4 @@ def posts():
         return render_template('posts.html', posts=all_posts)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=80)
